@@ -22,7 +22,7 @@ class DocRepresent(PreProcess):
         global uniIdent
         c=1
         indexer=os.listdir(self.Dir)
-        #indexer.sort()
+        indexer.sort()
         for i in indexer:
             StemData=PreProcess(self.Dir+i).Lemmatization()
             globals()['data%s' %c] = StemData
@@ -67,17 +67,19 @@ class DocRepresent(PreProcess):
             mat2[i]=indexList
         
         #multiplying elements of TF and IDF matrix to create TF-IDF matrix
-        matMain=np.zeros((c-1,len(uniIdent)))
-        for i in range(matMain.shape[0]):
-            for j in range(matMain.shape[1]):
-                matMain[i,j]=mat1[i,j]*mat2[i,j]
-        return matMain
+        matMain=np.multiply(mat1,mat2)
+        #for i in range(matMain.shape[0]):
+            #for j in range(matMain.shape[1]):
+                #matMain[i,j]=mat1[i,j]*mat2[i,j]
+        return matMain,indexer
                 
     def corpusCreater(self):
+        global indexer
         #creating corpus to feed to the library
         global corpus
         corpus=[]
         indexer=os.listdir(self.Dir)
+        indexer.sort()
         for i in indexer:
             Data=PreProcess(self.Dir+i).fetchComb()
             corpus.append(Data)
@@ -88,7 +90,7 @@ class DocRepresent(PreProcess):
         self.corpusCreater()
         vectorizer = TfidfVectorizer(stop_words='english')
         X = vectorizer.fit_transform(corpus)
-        return X
+        return X,indexer
 
     def Transform(self,doc,method='auto'):
         if method=='auto':
